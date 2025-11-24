@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Para o Amor da Minha Vida</title>
+
+<style>
+body {
+    margin: 0;
+    background: #111;
+    font-family: Arial, sans-serif;
+    color: white;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#container {
+    text-align: center;
+    max-width: 90%;
+    width: 480px;
+}
+
+h1 {
+    font-size: 26px;
+    margin-bottom: 5px;
+}
+
+h2 {
+    margin-top: 0;
+    font-size: 20px;
+}
+
+.message {
+    font-size: 20px;
+    line-height: 1.6;
+    margin-top: 20px;
+    animation: fade 0.6s ease;
+}
+
+button {
+    margin-top: 25px;
+    padding: 12px 20px;
+    font-size: 18px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    background: #ff7b00;
+    color: white;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+button:hover {
+    transform: scale(1.05);
+}
+
+.options {
+    margin-top: 20px;
+}
+
+.option-btn {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+    background: #0077ff;
+}
+
+@keyframes fade {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.heart {
+    position: fixed;
+    font-size: 28px;
+    animation: fall 2s linear forwards;
+    z-index: 9999;
+}
+
+@keyframes fall {
+    0% { transform: translateY(-50px); opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+}
+</style>
+</head>
+
+<body>
+<div id="container">
+    <h1>Para o amor da minha vida</h1>
+    <h2>💙🧡</h2>
+    <div id="content"></div>
+</div>
+
+<script>
+function hearts(color) {
+    for (let i = 0; i < 25; i++) {
+        const heart = document.createElement("div");
+        heart.classList.add("heart");
+        heart.textContent = color === "blue" ? "💙" : "🧡";
+        heart.style.left = Math.random() * 100 + "vw";
+        heart.style.animationDuration = 1.8 + Math.random() + "s";
+        document.body.appendChild(heart);
+        setTimeout(() => heart.remove(), 2200);
+    }
+}
+
+function errorEffect() {
+    navigator.vibrate?.([80, 40, 80]);
+    hearts("blue");
+    hearts("orange");
+}
+
+function successEffect() {
+    hearts("blue");
+    hearts("orange");
+}
+
+const slides = [
+    {
+        type: "msg",
+        text: "Oi, meu amor. 💙🧡<br><br>Antes de qualquer coisa, quero te lembrar que você é o grande amor da minha vida."
+    },
+
+    {
+        type: "msg",
+        text: "Você ilumina meus dias, deixa minha vida mais colorida e me ensina a amar melhor."
+    },
+
+    {
+        type: "msg",
+        text: "Eu te admiro tanto… pela força, pelo coração lindo e por ser exatamente quem você é."
+    },
+
+    {
+        type: "msg",
+        text: "Obrigada por existir. Obrigada por ser você. Obrigada por ser minha."
+    },
+
+    {
+        type: "quiz",
+        question: "Qual é a pessoa mais linda desse mundo?",
+        options: ["Uma atriz", "Uma modelo", "Você", "Alguma famosa"],
+        correct: "Você"
+    },
+
+    {
+        type: "msg",
+        text: "Você tem ideia do quanto é especial? Porque pra mim… você é única."
+    },
+
+    {
+        type: "msg",
+        text: "Eu amo o seu sorriso. Amo seu jeitinho. Amo até o que você acha que é defeito."
+    },
+
+    {
+        type: "quiz",
+        question: "O que eu mais amo em você?",
+        options: ["Seu cabelo", "Seu corpo", "Seu sorriso", "Seu conjunto inteirinho"],
+        correct: "Seu conjunto inteirinho"
+    },
+
+    {
+        type: "msg",
+        text: "Você me faz querer ser uma pessoa melhor todos os dias."
+    },
+
+    {
+        type: "msg",
+        text: "Eu olho pra você e penso: 'É ela. Sempre foi ela. Sempre vai ser ela.'"
+    },
+
+    {
+        type: "quiz",
+        question: "O que eu quero com você?",
+        options: ["Nada sério", "Só ficar", "Construir tudo juntas", "Te esquecer"],
+        correct: "Construir tudo juntas"
+    },
+
+    {
+        type: "msg",
+        text: "Você é o meu porto seguro, minha paz e meu caos favorito."
+    },
+
+    {
+        type: "msg",
+        text: "Eu te amo de um jeito que nunca amei ninguém."
+    },
+
+    {
+        type: "quiz",
+        question: "Quem é o amor da minha vida?",
+        options: ["Outra pessoa", "Uma ex", "Uma atriz", "Você"],
+        correct: "Você"
+    },
+
+    {
+        type: "msg",
+        text: "Obrigada por cada detalhe seu que me fez te escolher todos os dias."
+    },
+
+    {
+        type: "msg",
+        text: "Eu quero você hoje, amanhã, depois… e em todas as versões de nós."
+    },
+
+    {
+        type: "msg",
+        text: "Fim? Nunca. Porque enquanto eu tiver amor pra te dar… você vai ter um lar em mim. 💙🧡"
+    }
+];
+
+let index = 0;
+loadSlide();
+
+function loadSlide() {
+    const c = document.getElementById("content");
+    const s = slides[index];
+
+    if (!s) return;
+
+    if (s.type === "msg") {
+        c.innerHTML = `
+            <div class="message">${s.text}</div>
+            <button onclick="next()">Próximo</button>
+        `;
+    } else {
+        let opts = "";
+        s.options.forEach(o => {
+            opts += `<button class="option-btn" onclick="answer('${o}', '${s.correct}')">${o}</button>`;
+        });
+
+        c.innerHTML = `
+            <div class="message">${s.question}</div>
+            <div class="options">${opts}</div>
+        `;
+    }
+}
+
+function answer(choice, correct) {
+    const c = document.getElementById("content");
+
+    if (choice === correct) {
+        successEffect();
+        c.innerHTML = `
+            <div class="message">
+            Só quero te lembrar que você é incrível, é maravilhosa, é gostosa,
+            é inteligente, que você me encanta, é minha vida,
+            que é amada e é tudo que eu sempre sonhei. 💙🧡
+            </div>
+            <button onclick="next()">Próximo</button>
+        `;
+    } else {
+        errorEffect();
+        c.innerHTML = `
+            <div class="message">
+            RESPOSTA ERRADA.<br>
+            Só quero te lembrar que você é incrível, é maravilhosa, é gostosa,
+            é inteligente, que você me encanta, é minha vida,
+            que é amada e é tudo que eu sempre sonhei. 💙🧡
+            </div>
+            <button onclick="next()">Próximo</button>
+        `;
+    }
+}
+
+function next() {
+    index++;
+    loadSlide();
+}
+</script>
+
+</body>
+</html>
