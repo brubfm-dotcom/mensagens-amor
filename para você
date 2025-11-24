@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>60 Dias — Para o amor da minha vida</title>
+<style>
+:root{--blue:#1e90ff;--orange:#ff8c00;background:#fff}
+html,body{height:100%;margin:0;font-family:Inter,Arial,Helvetica,sans-serif;background:white}
+.wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:20px}
+.card{width:min(720px,98%);max-width:720px;background:#fff;border-radius:16px;border:2px solid var(--blue);box-shadow:0 8px 30px rgba(0,0,0,0.06);padding:28px;position:relative;overflow:hidden}
+h1{margin:0 0 6px;font-size:20px;color:var(--blue);text-align:center}
+.hearts-line{font-size:20px;margin-bottom:12px;text-align:center}
+.content{min-height:160px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;transition:opacity .35s,transform .35s}
+p{margin:0;color:var(--blue);font-size:18px;text-align:center}
+.big{font-size:22px;font-weight:600}
+.controls{display:flex;gap:10px;margin-top:18px;justify-content:center}
+button{padding:10px 14px;border-radius:10px;border:none;cursor:pointer;font-size:16px}
+.btn-blue{background:var(--blue);color:white}
+.btn-orange{background:var(--orange);color:white}
+input[type=number]{width:80px;padding:8px;border-radius:8px;border:1px solid var(--blue);font-size:16px}
+.small{font-size:14px}
+.hidden{display:none}
+/* hearts falling on reactions (correct/wrong) */
+#reactionHearts{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:50}
+.heart{position:absolute;font-size:28px;will-change:transform,opacity}
+@keyframes fall{0%{transform:translateY(-10vh)}100%{transform:translateY(110vh);opacity:0}}
+/* shake */
+@keyframes shake{0%{transform:translate(0,0)}20%{transform:translate(-14px,0)}40%{transform:translate(14px,0)}60%{transform:translate(-14px,0)}80%{transform:translate(14px,0)}100%{transform:translate(0,0)}}
+.shake{animation:shake .55s ease-in-out}
+/* responsive */
+@media (max-width:520px){.card{padding:18px}.content{min-height:220px}p{font-size:16px}}
+</style>
+</head>
+<body>
+<div id="reactionHearts"></div>
+<div class="wrap">
+<div class="card" id="card">
+<h1>Para o amor da minha vida</h1>
+<div class="hearts-line">💙🧡</div>
+<div class="content" id="content"></div>
+<div class="controls" id="controls">
+<button class="btn-orange" id="nextBtn">Próximo </button>
+</div>
+</div></div>
+<script>
+// --- DATA ---
+const DAYS = [
+{ type: "message", title: "Oi, meu amor", text: "Você é maravilhosa e merece o mundo." },
+{ type: "letter", title: "Cartinha", text: "Só passei para dizer que você é incrível. Obrigada por existir." },
+{ type: "poem", title: "Poema brega", text: "Teu sorriso é mapa — e eu me perco inteira." },
+{ type: "message", title: "Lembrete", text: "Não esquece de beber água hoje. Amo você" },
+{ type: "minigame", title: "Acerte o número", text: "Escolha um número de 0 a 10 e veja se eu penso no mesmo.", answer: 20 },
+{ type: "poem", title: "Poema brega", text: "Cada gesto teu vira canção nos meus dias." },
+{ type: "message", title: "Lembrete", text: "Você é incrível, é amada, é linda e muito inteligente." },
+{ type: "letter", title: "Poema brega", text: "Se eu pudesse, daria o universo para te ver sorrir." },
+{ type: "message", title: "Cartinha", text: "Um beijo virtual pra ficar bem." },
+{ type: "letter", title: "Bilhetinho", text: "Hoje lembrei de você e sorri como sempre, quando me lembro de você." },
+{ type: "letter", title: "Carta", text: "Obrigada por me fazer querer ser melhor. Você é incrível" },
+{ type: "poem", title: "Poema brega", text: "Seu nome é meu poema favorito." },
+{ type: "minigame", title: "Adivinhe o número", text: "Eu escolhi um número entre 1 e 5. Tente adivinhar.", answer: 45 },
+{ type: "poem", title: "Poema brega", text: "Você é sol em dias nublados." },
+{ type: "letter", title: "Carta", text: "Gosto do jeito em que cuida das pessoas, dos animais e atenção que dá a eles. Você é maravilhosa" },
+{ type: "message", title: "Motivo 48", text: "Adoro ouvir você falar sobre seus sonhos, anseios e tudo que ama." },
+{ type: "quiz", title: "Quiz", question: "Qual a coisa que mais amo em você?", options: ["Boca","Olhos","Seios","Tudo"], answer: 3 }
+];
+
+// get day index
+function getDayIndex(){
+ const KEY='surpresa_60_start';
+ let start = localStorage.getItem(KEY);
+ if(!start){ start = new Date().toISOString().slice(0,10); localStorage.setItem(KEY,start); }
+ const s = new Date(start+'T00:00:00');
+ const t = new Date();
+ const diff = Math.floor((Date.UTC(t.getFullYear(),t.getMonth(),t.getDate()) - Date.UTC(s.getFullYear(),s.getMonth(),s.getDate()))/(86400000));
+ return ((diff % DAYS.length)+DAYS.length)%DAYS.length;
+}
+
+// render
+function renderForIndex(i){
+ const obj = DAYS[i];
+ const c = document.getElementById('content');
+ c.innerHTML = '';
+
+ if(["message","letter","poem","mantra"].includes(obj.type)){
+   const title=document.createElement('div');
+   title.className='big';
+   title.textContent=obj.title;
+   c.appendChild(title);
+   const p=document.createElement('p'); p.textContent=obj.text; c.appendChild(p);
+ }
+ else if(obj.type==='quiz'){
+   const title=document.createElement('div'); title.className='big'; title.textContent=obj.title; c.appendChild(title);
+   const q=document.createElement('p'); q.textContent=obj.question; c.appendChild(q);
+
+   const list=document.createElement('div');
+   list.style.width='100%'; list.style.display='grid'; list.style.gap='8px'; list.style.marginTop='8px';
+
+   obj.options.forEach((ch,idx)=>{
+     const b=document.createElement('button'); b.className='btn-blue'; b.textContent=ch;
+     b.onclick=()=>{
+       if(idx===obj.answer){ showCorrect(); }
+       else{ showQuizWrong(); }
+     };
+     list.appendChild(b);
+   });
+   c.appendChild(list);
+ }
+ else if(obj.type==='minigame'){
+   const title=document.createElement('div'); title.className='big'; title.textContent=obj.title; c.appendChild(title);
+   const p=document.createElement('p'); p.textContent=obj.text; c.appendChild(p);
+
+   const row=document.createElement('div'); row.style.display='flex'; row.style.gap='8px'; row.style.marginTop='8px';
+   const input=document.createElement('input'); input.type='number'; input.min='0'; input.max='100'; row.appendChild(input);
+   const btn=document.createElement('button'); btn.className='btn-orange'; btn.textContent='Tentar';
+   btn.onclick=()=>{
+     const val=Number(input.value);
+     if(val===obj.answer){ showCorrect(); }
+     else{ showQuizWrong(); }
+   };
+   row.appendChild(btn);
+   c.appendChild(row);
+ }
+}
+
+// shake + hearts + message WRONG
+function showQuizWrong(){
+ const c=document.getElementById('content');
+ c.innerHTML='';
+
+ const p=document.createElement('p');
+ p.innerHTML='<strong>RESPOSTA ERRADA.</strong><br>Só quero te lembrar que você é incrível, é maravilhosa, é gostosa,<br>é inteligente, que você me encanta, é minha vida,<br>que é amada e é tudo que eu sempre sonhei.';
+ c.appendChild(p);
+
+ const card=document.getElementById('card');
+ card.classList.add('shake');
+ setTimeout(()=>card.classList.remove('shake'),600);
+
+ startReactionHearts();
+}
+
+// CORRECT
+function showCorrect(){
+ const c=document.getElementById('content');
+ c.innerHTML='';
+ const p=document.createElement('p');
+ p.innerHTML='<strong>Só quero te lembrar que você é incrível, é maravilhosa, é gostosa,<br>é inteligente, que você me encanta, é minha vida,<br>que é amada e é tudo que eu sempre sonhei.</strong>';
+ c.appendChild(p);
+
+ startReactionHearts();
+}
+
+// hearts only on reactions
+function startReactionHearts(){
+ const cont=document.getElementById('reactionHearts');
+ for(let i=0;i<30;i++){
+   const el=document.createElement('div');
+   el.className='heart';
+   el.textContent=Math.random()>0.5?'💙':'🧡';
+   el.style.left=(Math.random()*90)+'%';
+   el.style.fontSize=(18+Math.random()*36)+'px';
+   const d=(4+Math.random()*6)+'s';
+   el.style.animation=`fall ${d} linear`;
+   cont.appendChild(el);
+   setTimeout(()=>el.remove(),12000);
+ }
+}
+
+// navigation
+let currentIndex=getDayIndex();
+function openToday(){ renderForIndex(currentIndex); }
+function nextOne(){ currentIndex=(currentIndex+1)%DAYS.length; renderForIndex(currentIndex); }
+
+// init
+const nextBtn=document.getElementById('nextBtn');
+nextBtn.onclick=()=> nextOne();
+openToday();
+</script>
+</body>
+</html>
