@@ -67,7 +67,7 @@ const DAYS = [
 
 // get day index
 function getDayIndex(){
- const KEY='surpresa_60_start';
+ const KEY='surpresa_start';
  let start = localStorage.getItem(KEY);
  if(!start){ start = new Date().toISOString().slice(0,10); localStorage.setItem(KEY,start); }
  const s = new Date(start+'T00:00:00');
